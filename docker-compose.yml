@@ -7,9 +7,9 @@ services:
     env_file:
       - .env
     volumes:
-      - ./reminders.db:/app/reminders.db
-      - ./output.log:/app/output.log
+      - ./data:/app/data
       - ./nrpc.pid:/app/nrpc.pid
+
     healthcheck:
       test: ["CMD-SHELL", "npm run health-check"]
       interval: 86400s
