@@ -4,8 +4,7 @@ import {
   getPublicKey,
   nip19,
   SimplePool,
-  getEventHash,
-  getSignature,
+  finalizeEvent
 } from "nostr-tools";
 import { CONFIG } from "../config.js";
 
@@ -29,13 +28,7 @@ async function main() {
     content: "",
     pubkey,
   };
-
-  const event: any = {
-    ...req,
-    id: getEventHash(req),
-  };
-
-  event.sig = getSignature(event, seckey);
+  const event = finalizeEvent(req, seckey);
   console.log(`Submitting request from ${npub}...`);
 
   try {
@@ -46,41 +39,41 @@ async function main() {
   }
 
   console.log(`Request submitted, waiting for response...`);
-  const sub = pool.sub(RELAYS, [
+  const sub = pool.subscribeMany(RELAYS,
     {
       kinds: [22069],
       "#e": [event.id],
       authors: [pubkey],
-    },
-  ]);
+    }, {
+    onevent: (event: any) => {
+      console.log("Got response:", event);
+      const status = event.tags.find((t: any) => t[0] === "status");
+      if (status && status[1] === "200") {
+        console.log("Health check passed!");
+        clearTimeout(timeout);
+        sub.close();
+        pool.close(RELAYS);
+        process.exit(0);
+      } else {
+        console.error("Health check failed: non-200 status");
+        clearTimeout(timeout);
+        sub.close();
+        pool.close(RELAYS);
+        process.exit(1);
+      }
+    }
+  });
 
   const timeout = setTimeout(() => {
     console.error("Health check failed: timeout");
-    sub.unsub();
+    sub.close();
     pool.close(RELAYS);
     process.exit(1);
   }, 10000); // 10 second timeout
-
-  sub.on("event", (event: any) => {
-    console.log("Got response:", event);
-    const status = event.tags.find((t: any) => t[0] === "status");
-    if (status && status[1] === "200") {
-      console.log("Health check passed!");
-      clearTimeout(timeout);
-      sub.unsub();
-      pool.close(RELAYS);
-      process.exit(0);
-    } else {
-      console.error("Health check failed: non-200 status");
-      clearTimeout(timeout);
-      sub.unsub();
-      pool.close(RELAYS);
-      process.exit(1);
-    }
-  });
 }
 
 main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+
