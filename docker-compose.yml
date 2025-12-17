@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  nrpc-server:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./reminders.db:/app/reminders.db
+      - ./output.log:/app/output.log
+      - ./nrpc.pid:/app/nrpc.pid
+    healthcheck:
+      test: ["CMD-SHELL", "npm run health-check"]
+      interval: 86400s
+      timeout: 20s
+      retries: 3
+      start_period: 60s
+
+  

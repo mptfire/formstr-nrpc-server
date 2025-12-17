@@ -4,7 +4,8 @@
     "dev": "ts-node-esm src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
-    "seed": "npm run build && node dist/scripts/seedWallet.js"
+    "seed": "npm run build && node dist/scripts/seedWallet.js",
+    "health-check": "npm run build && qnode dist/scripts/health-check.js"
   },
   "dependencies": {
     "@cashu/cashu-ts": "^2.5.3",
