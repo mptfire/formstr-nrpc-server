@@ -9,7 +9,7 @@ export interface Reminder {
   scheduled_at: number;
 }
 
-const db = new Database("./reminders.db");
+const db = new Database("./reminders.db", { fileMustExist: false });
 db.pragma("journal_mode = WAL");
 
 db.prepare(
