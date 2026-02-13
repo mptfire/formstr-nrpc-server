@@ -52,6 +52,7 @@ import { ReminderController } from "./controllers/ReminderController.js";
 import { NostrService } from "./services/nostr.js";
 import { assertServerKeys } from "./utils.js";
 import { SchedulePostController } from "./controllers/SchedulePostController.js";
+import { AIController } from "./controllers/AIController.js";
 
 async function main() {
   try {
@@ -65,6 +66,7 @@ async function main() {
   // new DMController(Registry);
   // new ErrorController(Registry);
   new SchedulePostController(Registry);
+  new AIController(Registry);
 
   const nostr = new NostrService(CONFIG.relays);
   try {

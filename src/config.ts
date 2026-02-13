@@ -22,4 +22,5 @@ export const CONFIG = {
   lud16: process.env.LUD16 || "",
   website: process.env.WEBSITE || "",
   nip05: process.env.NIP05 || "",
+  ollamaBaseUrl: process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434",
 };

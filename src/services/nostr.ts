@@ -28,6 +28,8 @@ export class NostrService {
   private subs: any[] = [];
   private relays: string[];
   private heartbeatInterval: NodeJS.Timeout | null = null;
+  private consecutiveHeartbeatFailures: number = 0;
+  private readonly MAX_HEARTBEAT_FAILURES = 2;
 
   constructor(relayUrls: string[]) {
     this.relays = relayUrls;
@@ -95,10 +97,22 @@ export class NostrService {
         console.log("[NostrService] heartbeat — refreshing subscriptions");
         await this.subscribeRequests();
         await this.logRelayStates();
+        this.consecutiveHeartbeatFailures = 0; // Reset on success
       } catch (err) {
-        console.error("[NostrService] heartbeat error", err);
+        this.consecutiveHeartbeatFailures++;
+        console.error(
+          `[NostrService] heartbeat error (${this.consecutiveHeartbeatFailures}/${this.MAX_HEARTBEAT_FAILURES})`,
+          err
+        );
+
+        if (this.consecutiveHeartbeatFailures >= this.MAX_HEARTBEAT_FAILURES) {
+          console.error(
+            `[NostrService] Max heartbeat failures reached. Exiting to trigger restart.`
+          );
+          process.exit(1);
+        }
       }
-    }, 1800 * 1000);
+    }, 300 * 1000); // 5 minutes
   }
 
   private closeSubscriptions() {
