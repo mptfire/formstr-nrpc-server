@@ -50,6 +50,7 @@ export class ReminderController extends BaseController {
       event.pubkey
     );
     result.message = "Message is now scheduled";
+    return result;
   }
 
   async getMethods() {
