@@ -222,7 +222,7 @@ export class NostrService {
     } else {
       return;
     }
-    console.log("EVENT TO BE PROCESSED IS", JSON.stringify(eventToProcess));
+    console.log("[NostrService] processing request", eventToProcess.id, "kind", eventToProcess.kind);
     try {
       const pTags = eventToProcess.tags
         .filter((t) => t[0] === "p")
@@ -236,7 +236,6 @@ export class NostrService {
       const params: NRPCParams = {};
       for (const t of eventToProcess.tags)
         if (t[0] === "param") params[t[1]] = t[2] ?? "";
-      console.log("METHODS ARE", Methods);
       if (!Methods.has(method))
         return this.publishError(event, 404, `method ${method} not found`);
       const handler = Methods.get(method)!;

@@ -44,8 +44,7 @@ export class GiveawayWalletService {
         }
 
         // Update wallet state
-        console.log("Deleting proofs:", send);
-        console.log("Keeping proofs:", keep);
+        // Proof secrets are spendable bearer tokens; never write them to logs.
         this.proofStore.deleteProofs(selectedProofs.send, this.mintUrl);
         this.proofStore.saveProofs(keep, this.mintUrl);
         this.proofs = [...keep];

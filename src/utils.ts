@@ -23,7 +23,9 @@ export function assertServerKeys() {
     CONFIG.pubKeyHex = getPublicKey(
       nip19.decode(CONFIG.privKey).data as Uint8Array
     );
-  console.log("CONFIG IS", CONFIG);
+  // Never log CONFIG itself: CONFIG.privKey holds the server NSEC and this
+  // function runs on every signed response, so logs would capture the key.
+  console.log("CONFIG IS", { ...CONFIG, privKey: "<redacted>" });
 }
 
 function createWrap(
